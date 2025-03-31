@@ -45,7 +45,7 @@ class order():
         self.value = value
         self.time_required = time_required
         self.shipping_date = shipping_date
-
+    
 
 
 
