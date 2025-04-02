@@ -5,15 +5,13 @@ import pandas as pd
 
 
 class location():
-    def __init__(self, postcode , coords, locationtype = 'N/A' ):
+    def __init__(self, postcode , coords ):
         self.postcode = postcode
         self.coords = coords
-        self.locationtype = locationtype
 
 
     def __str__(self):
-        return self.postcode + ' ' + str(self.coords) + ' ' + self.locationtype
-    
+        return self.postcode + ' ' + str(self.coords)
     def distanceto(self, otherlocation):
         return distance(self, otherlocation)
 
@@ -38,7 +36,7 @@ def distance(loc1, loc2):
 
     
 class order():
-    def __init__(self,orderid :str, location, volume, value, time_required, shipping_date ):
+    def __init__(self,orderid :str, location: location, volume, value, time_required, shipping_date ):
         self.orderid = orderid
         self.location = location
         self.volume = volume
@@ -46,12 +44,24 @@ class order():
         self.time_required = time_required
         self.shipping_date = shipping_date
     
+    def __str__(self):
+        return self.orderid + ' ' + str(self.location) + ' ' + str(self.volume) + ' ' + str(self.value) + ' ' + str(self.time_required) + ' ' + str(self.shipping_date) 
 
 class route():
     def __init__(self, orderlist, totalDistance, estimatedTime):
+        #Note that the orderlist is ORDERED. 
         self.orderlist = orderlist
-        self.distances = []
-        self.time = 0
-        self.value = 0
-        self.volume = 0
+        self.totalDistance = totalDistance
+        self.estimatedTime = estimatedTime
         
+def distanceMatrix(orderlist):
+    #So we have a large list of N orders, we want an N*N matrix of distances between each order
+    Dmat = np.zeros((len(orderlist), len(orderlist)))
+    for i in range(len(orderlist)):
+        for j in range(len(orderlist)):
+            if i != j:
+                Dmat[i,j] = distance(orderlist[i].location, orderlist[j].location)
+    return Dmat
+
+
+
