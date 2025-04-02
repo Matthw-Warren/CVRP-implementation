@@ -47,5 +47,11 @@ class order():
         self.shipping_date = shipping_date
     
 
-
-
+class route():
+    def __init__(self, orderlist, totalDistance, estimatedTime):
+        self.orderlist = orderlist
+        self.distances = []
+        self.time = 0
+        self.value = 0
+        self.volume = 0
+        

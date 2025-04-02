@@ -20,3 +20,5 @@ data = pd.concat(df_list)
 #Let's now save this as we'll be using it a decent amount!
 data.to_csv('sample/data/postcodes_coords.csv', index=False)
 
+## Note also have benchmark data https://www.sintef.no/projectweb/top/vrptw/
+
