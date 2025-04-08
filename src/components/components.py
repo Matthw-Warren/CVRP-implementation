@@ -11,7 +11,7 @@ class location():
 
 
     def __str__(self):
-        return self.postcode + ' ' + str(self.coords)
+        return f'Postcode {self.postcode} with coords {str(self.coords)}'
     def distanceto(self, otherlocation):
         return distance(self, otherlocation)
 
