@@ -30,7 +30,6 @@ def SNN_solve(Dmat, order_sizes, capacity, fleetsize):
         while route_loads[vehicle] < capacity and unvisited:
             nearest_customer = None
             nearest_distance = float('inf')
-            print(routes[vehicle])
             #Then we look through the unvisited nodes to find the nearest. 
             for customer in unvisited:
                 if Dmat[current_location][customer] < nearest_distance and route_loads[vehicle] + order_sizes[customer] <= capacity:
@@ -49,7 +48,6 @@ def SNN_solve(Dmat, order_sizes, capacity, fleetsize):
 
         routes[vehicle].append(0)  # Return to depot
         #Could here do some optimisation - but again we're not there yet.
-
     return routes, route_loads
 
 

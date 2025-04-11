@@ -47,55 +47,73 @@ for i in range(len(Order_List)):
     for j in range(len(Order_List)):
         Dmat[i][j] = Order_List[i].location.distanceto(Order_List[j].location)
 
-#Ok - lets run this thang. 
-print(len(Order_List), len(Dmat), len(random_volumes))
-routes, route_loads = ch.PNN_solve(Dmat, random_volumes, Q, F)
-print('Routes:', routes)
-print(sum(route_loads.values()))
+
+
+
+# #Ok - lets run this thang. 
+
+
+"""PNN_solving"""
+
+# print(len(Order_List), len(Dmat), len(random_volumes))
+# routes, route_loads = ch.PNN_solve(Dmat, random_volumes, Q, F)
+# print('Routes:', routes)
+# print(sum(route_loads.values()))
+
+
 
 #Intersting - many of the routes are empty - EVEN WITH parallel NN - so perhaps our fleet is far to large. 
 
 
+# # #Okay - let's also implement the SNN method 
 
-#Going to save the data - and use for plotting on the map!?
+"""SNN_solving"""
 
-import folium 
-
-
-
-#We now create the map in folium
-m = folium.Map(location=depot_location.coords)
-
-# Add depot marker
-
-folium.Marker(
-    depot_location.coords,
-    popup= f"Depot, Postcode = {depot_location.postcode}",
-    icon=folium.Icon('blue', icon= 'Depot')
-).add_to(m)
-
-#Then add the rest!
+# routes ,route_loads = ch.SNN_solve(Dmat, random_volumes, Q, F)
+# print('Routes:', routes) 
 
 
-for i, loc in enumerate([x.coords for x in random_locations]):
-    folium.Marker(
-        loc,
-        popup=f"Customer {i+1}",
-        icon=folium.Icon(color="blue", icon="home")
-    ).add_to(m)
 
-#Then we add the routes
-for i, route in enumerate(routes.values()):
-    scaled = int(i*255/F)
-    colour = 'rgb(' + str(scaled) + ',' + str(255-scaled) + ',0)' 
-    route_coords = [random_locations[i].coords for i in route]
-    folium.PolyLine(
-        locations=route_coords,
-        color= colour,
-        weight=5,
-        opacity=0.7,
-    ).add_to(m)
+# #Going to save the data - and use for plotting on the map!?
 
-m.save("tests/folium_map.html")
+
+
+# import folium 
+
+# #We now create the map in folium
+
+# m = folium.Map(location=depot_location.coords)
+
+# # Add depot marker
+
+# folium.Marker(
+#     depot_location.coords,
+#     popup= f"Depot, Postcode = {depot_location.postcode}",
+#     icon=folium.Icon('blue', icon= 'Depot')
+# ).add_to(m)
+
+# #Then add the rest!
+
+
+# for i, loc in enumerate([x.coords for x in random_locations]):
+#     folium.Marker(
+#         loc,
+#         popup=f"Customer {i+1}",
+#         icon=folium.Icon(color="blue", icon="home")
+#     ).add_to(m)
+
+# #Then we add the routes
+# for i, route in enumerate(routes.values()):
+#     scaled = int(i*255/F)
+#     colour = 'rgb(' + str(scaled) + ',' + str(255-scaled) + ',0)' 
+#     route_coords = [random_locations[i].coords for i in route]
+#     folium.PolyLine(
+#         locations=route_coords,
+#         color= colour,
+#         weight=5,
+#         opacity=0.7,
+#     ).add_to(m)
+
+# # m.save("tests/SNN_map.html")
 
 
