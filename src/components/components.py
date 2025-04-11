@@ -5,7 +5,7 @@ import pandas as pd
 
 
 class location():
-    def __init__(self, postcode , coords ):
+    def __init__(self, postcode :str , coords: tuple):
         self.postcode = postcode
         self.coords = coords
 
@@ -47,8 +47,9 @@ class order():
     def __str__(self):
         return self.orderid + ' ' + str(self.location) + ' ' + str(self.volume) + ' ' + str(self.value) + ' ' + str(self.time_required) + ' ' + str(self.shipping_date) 
 
+
 class route():
-    def __init__(self, orderlist, totalDistance, estimatedTime):
+    def __init__(self, orderlist, totalDistance, estimatedTime,driver = 'Unassigned'):
         #Note that the orderlist is ORDERED. 
         self.orderlist = orderlist
         self.totalDistance = totalDistance

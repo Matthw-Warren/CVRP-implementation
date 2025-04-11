@@ -6,7 +6,53 @@
 #2-Opt algorithm, which removes route crossings - good because drivers dont like to overleap routes
 import numpy as np
 import pandas as pd
-from components import components as cp
+from src.components import components as cp
+
+
+def NN_solution(Dmat, order_sizes, capacity, fleetsize):
+    #This is the simplest greedy algorithm going. 
+    if sum(order_sizes) > fleetsize*capacity:
+        return 'Insufficient fleet'
+    routes = {i: [0] for i in range(fleetsize)}
+    route_loads = {i: 0 for i in range(fleetsize)}
+    # Start from depot (0) and we shall add in vertices
+    N = len(Dmat)  # Number of customers + depot
+    unvisited = list(range(1, N))  # Customers to visit
+    # Start with the first vehicle
+    for vehicle in range(fleetsize):
+        current_location = 0  # Start at depot
+        route_loads[vehicle] = 0
+        while route_loads[vehicle] < capacity and unvisited:
+            # Find the nearest unvisited customer
+            nearest_customer = None
+            min_distance = float('inf')
+            for customer in unvisited:
+                if Dmat[current_location][customer] < min_distance:
+                    min_distance = Dmat[current_location][customer]
+                    nearest_customer = customer
+            
+            # Check if adding this customer exceeds capacity
+            if route_loads[vehicle] + order_sizes[nearest_customer] <= capacity:
+                routes[vehicle].append(nearest_customer)
+                route_loads[vehicle] += order_sizes[nearest_customer]
+                unvisited.remove(nearest_customer)
+                current_location = nearest_customer
+            else:
+                break
+
+
+    
+
+
+        
+
+
+
+
+
+
+
+
 
 
 
