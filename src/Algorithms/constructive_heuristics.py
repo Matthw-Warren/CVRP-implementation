@@ -38,7 +38,6 @@ def SNN_solve(Dmat, order_sizes, capacity, fleetsize):
                     nearest_customer = customer
             if nearest_customer is not None:
                     # Add the nearest customer to the route
-                    print(nearest_customer)
                     routes[vehicle].append(nearest_customer)
                     route_loads[vehicle] += order_sizes[nearest_customer]
                     unvisited.remove(nearest_customer)
