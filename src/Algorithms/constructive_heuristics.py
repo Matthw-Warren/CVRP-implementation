@@ -138,48 +138,96 @@ def SInsert_solve(Dmat, order_sizes, capacity, fleetsize):
                 route_loads[vehicle] += order_sizes[best_customer]
                 unvisited.remove(best_customer)
             else:
-                return 'Method problemo!' #Again - greedyness doesn't garuntee a solution!
+                return 'Method problem!' #Again - greedyness doesn't garuntee a solution!
     return routes, route_loads
+
+
+# We could try and spruce our insertion methods up - for example we could initialise a route with the furthest customer from the depot!
 
 
 # Since sequential and parallel methods follow the same pattern - we should perhpas define a funciton implementing 
 # them and just change criterion?- Indeed I'm copying and pasting a decent bit of code here. 
 
 
-#Next we look as savings heursitcs - again constructive heuristics. Clark Wright (CW) is the most well known.
 
 
 
+#Now lets do this in parallel
+#Note - again, one can edit this so its not so greedy - take the node with maximal min diatance from routes - makes shape nicer.
+# There are many tweaks that can be made to this method - farthest insert and regret insert.
 
-
-
-
-def clarke_wright_savings(distance_matrix, demands, vehicle_capacity):
-    """Solves CVRP using Clarke-Wright Savings Heuristic."""
-    num_customers = len(distance_matrix) - 1  # Exclude depot (index 0)
+def PInsert_solve(Dmat, order_sizes, capacity, fleetsize):
+    """CVRP solve using parallel insertion heuristic"""
+    if sum(order_sizes) > fleetsize*capacity:
+        return 'Insufficient fleet'
+    # Initialise the routes
+    routes = {i: [0,0] for i in range(fleetsize)}
+    route_loads = {i: 0 for i in range(fleetsize)}
     
-    # Step 1: Compute Savings
+    # Start from depot (0) and we shall add in vertices
+    N = len(Dmat)  # Number of customers + depot
+    unvisited = list(range(1, N))  # Customers to visit
+    while unvisited:
+        best_customer = None
+        best_change = float('inf')
+        best_route = None
+        best_position = None
+        for customer in unvisited:
+            # Loop through the routes to find the best insertion point
+            for vehicle in range(fleetsize):
+                for i in range(len(routes[vehicle]) - 1):
+                    change = Dmat[routes[vehicle][i]][customer] + Dmat[customer][routes[vehicle][i + 1]] - Dmat[routes[vehicle][i]][routes[vehicle][i + 1]]
+                    if change < best_change and route_loads[vehicle] + order_sizes[customer] <= capacity:
+                        best_change = change
+                        best_customer = customer
+                        best_route = vehicle
+                        best_position = i + 1
+        if best_customer is not None:
+            # Insert the best customer into the route
+            routes[best_route].insert(best_position, best_customer)
+            route_loads[best_route] += order_sizes[best_customer]
+            unvisited.remove(best_customer)
+        else:
+            return 'Method problem!' #Again - greedyness doesn't garuntee a solution!
+    return routes, route_loads
+
+
+
+
+#Next we look as savings heursitcs Clark Wright (CW) is the most well known. Again there are sequential and parallel methods.
+#In general this has fleetsize are a decision variable.
+#  
+def CW_solve(Dmat, order_sizes, capacity):
+    """Solves CVRP using Clarke-Wright Savings Heuristic."""
+    num_customers = len(Dmat) - 1  # Exclude depot (index 0)
+
+    # Compute Savings at start - this saves time!
     savings = []
     for i in range(1, num_customers + 1):
         for j in range(i + 1, num_customers + 1):
-            save = distance_matrix[0][i] + distance_matrix[0][j] - distance_matrix[i][j]
+            save = Dmat[0][i] + Dmat[0][j] - Dmat[i][j]
             savings.append((save, i, j))
-    savings.sort(reverse=True)  # Sort by descending savings
+    savings.sort(reverse=True)  # Sort by descending savings - python uses 'timsort' O(nlog(n))
 
-    # Step 2: Start with separate routes for each customer
+    # Okay we then create a route for each customer
     routes = {i: [i] for i in range(1, num_customers + 1)}
-    route_loads = {i: demands[i] for i in range(1, num_customers + 1)}
-    
-    # Step 3: Merge routes based on savings
+    route_loads = {i: order_sizes[i] for i in range(1, num_customers + 1)}
+    #and merge these based on the savings. 
     for save, i, j in savings:
         if i in routes and j in routes and i != j:
-            if route_loads[i] + route_loads[j] <= vehicle_capacity:
+            if route_loads[i] + route_loads[j] <= capacity:
                 # Merge routes
                 routes[i].extend(routes[j])
                 route_loads[i] += route_loads[j]
                 del routes[j]
 
-    # Step 4: Convert routes to include depot (0)
-    final_routes = [[0] + route + [0] for route in routes.values()]
-    return final_routes
+    #  convert the routes to include depot (0)
 
+
+    
+    final_routes = [[0] + route + [0] for route in routes.values()]
+    return {i: final_routes[i] for i in range(len(final_routes))}, route_loads
+
+#The sequential method does one route at a time - we shant impelment here.
+
+#Next we do a sweep method. Need to also look at methods implementing seeds, and cluster methods!
