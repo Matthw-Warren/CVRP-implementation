@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 from src.components import components as cp
-
+import src.Algorithms.improvement_heuristics as ih
 
 
 
@@ -41,6 +41,8 @@ def SNN_solve(Dmat, order_sizes, capacity, fleetsize):
                     route_loads[vehicle] += order_sizes[nearest_customer]
                     unvisited.remove(nearest_customer)
                     current_location = nearest_customer
+                    #Three opt at each change.
+                    routes[vehicle] = ih.three_opt(routes[vehicle], Dmat)
             else:
                 break
         #Then we return to the depot once this route is filled up. Not that even if there is a feasible route, this method may not even find it!
@@ -81,6 +83,8 @@ def PNN_solve(Dmat, order_sizes, capacity, fleetsize):
             routes[nearest_route].append(nearest_customer)
             route_loads[nearest_route] += order_sizes[nearest_customer]
             unvisited.remove(nearest_customer)
+            #Three opt at each change.
+            routes[nearest_route] = ih.three_opt(routes[nearest_route], Dmat)
         else:
             return 'Insufficient fleet (or infeasible method)' # again due to greedyness this could happen
     #We then return all routes to the depot

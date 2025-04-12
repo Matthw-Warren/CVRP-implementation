@@ -6,6 +6,38 @@ import pandas as pd
 
 
 #First - we do some intra route improvements. 
+#Recolation is the simplest. 
+def relocation(route, Dmat,timelim = None):
+    """Relocation improvement algorithm"""
+    best = route[:]
+    size = len(best)
+    improved = True
+    while improved:
+        improved = False
+        for i in range(1, size - 1):
+            for j in range(1, size - 1):
+                if i == j or i == j + 1 or j == i + 1:
+                    continue  # Skip adjacent nodes
+
+                # Nodes before and after the segment
+                A, B = best[i - 1], best[i]
+                C, D = best[j - 1], best[j]
+
+                # Current distance
+                dist_before = Dmat[A][B] + Dmat[C][D]
+                # Distance after relocating B to position of C
+                dist_after = Dmat[A][C] + Dmat[B][D]
+
+                # Check if the swap improves the tour
+                if dist_after < dist_before:
+                    best[i:j] = best[i + 1:j] + [B]
+                    improved = True
+                    break  # Greedy: accept first improvement
+            if improved:
+                break
+    return best
+
+
 
 #We shall only use two opt and three-opt - due to trade-off between time and quality.
 #We'll stop once lambdda-opt optimality i reached.
@@ -40,6 +72,7 @@ def two_opt(route, Dmat):
     return best
 
 # We now implement 3-opt - with first reconneciton.
+#I suppose 2 opt is a subset of three opt  - but here this isnt implemented a s we take ijk to be separate (double check what we did)
 def three_opt(route, Dmat):
     """3-opt with first reconneciton"""
     best = route[:]

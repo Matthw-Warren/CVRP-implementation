@@ -55,10 +55,11 @@ for i in range(len(Order_List)):
 
 """PNN_solving"""
 
-# print(len(Order_List), len(Dmat), len(random_volumes))
-# routes, route_loads = ch.PNN_solve(Dmat, random_volumes, Q, F)
-# print('Routes:', routes)
-# print(sum(route_loads.values()))
+routes, route_loads = ch.PNN_solve(Dmat, random_volumes, Q, F)
+for i in routes.keys():
+    routes[i] = ih.two_opt(routes[i], Dmat)
+print(routes)
+
 
 """SNN_solving"""
 
@@ -79,52 +80,53 @@ for i in range(len(Order_List)):
 
 """CW_solve"""
 #This has variable fleet size. 
-routes, route_loads= ch.CW_solve(Dmat, random_volumes, Q)
-for i in routes.keys():
-    routes[i] = ih.three_opt(routes[i], Dmat)
-    route_loads[i] = ih.two_opt(routes[i], Dmat)
-print(routes)
+# routes, route_loads= ch.CW_solve(Dmat, random_volumes, Q)
+# for i in routes.keys():
+#     routes[i] = ih.three_opt(routes[i], Dmat)
+#     route_loads[i] = ih.two_opt(routes[i], Dmat)
+# print(routes)
 
 
-import folium 
+# import folium 
 
-#We now create the map in folium
+# #We now create the map in folium
 
-m = folium.Map(location=depot_location.coords)
+# m = folium.Map(location=depot_location.coords)
 
-# Add depot marker
+# # Add depot marker
 
-folium.Marker(
-    depot_location.coords,
-    popup= f"Depot, Postcode = {depot_location.postcode}",
-    icon=folium.Icon('blue', icon= 'Depot')
-).add_to(m)
+# folium.Marker(
+#     depot_location.coords,
+#     popup= f"Depot, Postcode = {depot_location.postcode}",
+#     icon=folium.Icon('blue', icon= 'Depot')
+# ).add_to(m)
 
-#Then add the rest!
-
-
-for i, loc in enumerate([x.coords for x in random_locations]):
-    folium.Marker(
-        loc,
-        popup=f"Customer {i+1}",
-        icon=folium.Icon(color="blue", icon="home")
-    ).add_to(m)
-
-#Then we add the routes
-colourkeys = {0: 'red',1: 'green', 2: 'blue', 3: 'purple', 4: 'orange', 5: 'darkred', 6: 'yellow', 7: 'maroon', 8: 'darkblue', 9: 'darkgreen'}
+# #Then add the rest!
 
 
-for i, route in enumerate(routes.values()):
-    print('Route:', route)
-    colour = colourkeys[i]
-    route_coords = [random_locations[j].coords for j in route]
-    folium.PolyLine(
-        locations=route_coords,
-        color= colour,
-        weight=5,
-        opacity=0.7,
-    ).add_to(m)
+# for i, loc in enumerate([x.coords for x in random_locations]):
+#     folium.Marker(
+#         loc,
+#         popup=f"Customer {i+1}",
+#         icon=folium.Icon(color="blue", icon="home")
+#     ).add_to(m)
 
-m.save("tests/Maps/CW_map.html")
+# #Then we add the routes
+# colourkeys = {0: 'red',1: 'green', 2: 'blue', 3: 'purple', 4: 'orange', 5: 'darkred', 6: 'yellow', 7: 'maroon', 8: 'darkblue', 9: 'darkgreen'}
 
 
+# for i, route in enumerate(routes.values()):
+#     print('Route:', route)
+#     colour = colourkeys[i]
+#     route_coords = [random_locations[j].coords for j in route]
+#     folium.PolyLine(
+#         locations=route_coords,
+#         color= colour,
+#         weight=5,
+#         opacity=0.7,
+#     ).add_to(m)
+
+# m.save("tests/Maps/PNN_withopt.html")
+
+
+#Eventually in overlay want to toggle routes on and off!
