@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 from src.components import components as cp
-import src.Algorithms.improvement_heuristics as ih
+import src.Algorithms.intra_improvement_heuristics as ih
 
 
 
@@ -83,8 +83,8 @@ def PNN_solve(Dmat, order_sizes, capacity, fleetsize):
             routes[nearest_route].append(nearest_customer)
             route_loads[nearest_route] += order_sizes[nearest_customer]
             unvisited.remove(nearest_customer)
-            #Three opt at each change.
-            routes[nearest_route] = ih.three_opt(routes[nearest_route], Dmat)
+            #Three opt at each change. Hmm problem as depot has been changed here! UH-OH.
+            # routes[nearest_route] = ih.three_opt(routes[nearest_route], Dmat)
         else:
             return 'Insufficient fleet (or infeasible method)' # again due to greedyness this could happen
     #We then return all routes to the depot
@@ -235,3 +235,32 @@ def CW_solve(Dmat, order_sizes, capacity):
 #The sequential method does one route at a time - we shant impelment here.
 
 #Next we do a sweep method. Need to also look at methods implementing seeds, and cluster methods!
+
+#Sweep is quite intuitive - we need to first select a 'random' vertex to take angles from. We'll just use the frist non-depot vertex.
+#We'll implement as a cluster method - we cluster 'equally' (can be based on number of orders, or capactiy) into F clust
+# ers. Then solve the TSP (eg. using NN above, or insert.)
+#Also, we shall use equal-ish numbers in each cluster - this is sometimes more ideal for real world problems. 
+
+
+#Here we sweep around and reorder the vertices in anticlockwise.
+def sweep_order(coords : tuple , vertex_from=1):
+    #Again, the depot is at zero - so we dont include this. 
+    depot_coords = coords[0]
+    remaining_coords = [ (x[0]- depot_coords[0], x[1]-depot_coords[1])  for x in coords[1:]]
+    reordered_locations = [0,vertex_from]
+
+
+
+    vec1 = remaining_coords[vertex_from] / np.sqrt(sum(np.square(remaining_coords[vertex_from])))
+    #Then find orthogonal vector to this. 
+
+    for i in range(len(remaining_coords)):
+        if i != vertex_from:
+            #Note that our coordinates are on a sphere (the globe) so this is a bit iffy. But since we're only dealing with the manchester area,
+            #  we can treat this as a plane. 
+            #can take dot prod then find the 
+            dotprod = np.dot(vec1, remaining_coords[i]) 
+            angle = np.arccos(dotprod/np.sqrt(sum(np.square(remaining_coords[i]))))
+            #Next we find where this goes. But note we also
+
+        

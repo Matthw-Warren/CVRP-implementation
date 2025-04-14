@@ -3,11 +3,13 @@
 
 import numpy as np
 import pandas as pd 
-
+import time
 
 #First - we do some intra route improvements. 
-#Recolation is the simplest. 
-def relocation(route, Dmat,timelim = None):
+#Recolation is the simplest. Just take a thang out and replace it somewhere else.
+#Should invoke time lim
+#Also, we're greedy and accept the first improvement (hence break break break)
+def relocation_improve(route, Dmat,timelim = None):
     """Relocation improvement algorithm"""
     best = route[:]
     size = len(best)
@@ -16,34 +18,66 @@ def relocation(route, Dmat,timelim = None):
         improved = False
         for i in range(1, size - 1):
             for j in range(1, size - 1):
-                if i == j or i == j + 1 or j == i + 1:
-                    continue  # Skip adjacent nodes
+                if i == j:
+                    continue 
+            else: 
+                A,B,C = best[i-1], best[i], best[i+1]
+                D,E = best[j], best[j+1]
 
-                # Nodes before and after the segment
-                A, B = best[i - 1], best[i]
-                C, D = best[j - 1], best[j]
+                distance_before = Dmat[A][B] + Dmat[B][C] + Dmat[D][E]
+                distance_after = Dmat[A][C] + Dmat[D][B] + Dmat[B][E] 
 
-                # Current distance
-                dist_before = Dmat[A][B] + Dmat[C][D]
-                # Distance after relocating B to position of C
-                dist_after = Dmat[A][C] + Dmat[B][D]
-
-                # Check if the swap improves the tour
-                if dist_after < dist_before:
-                    best[i:j] = best[i + 1:j] + [B]
+                if distance_after < distance_before:
+                    # Relocate B (i-th node) after D (j-th node)
+                    node = best.pop(i)
+                    # If i < j, index shifts left after pop
+                    if i < j:
+                        best.insert(j, node)
+                    else:
+                        #If i >= j, our pop requires a lil shift!
+                        best.insert(j + 1, node)
                     improved = True
-                    break  # Greedy: accept first improvement
+                    break
             if improved:
                 break
+        if improved:
+            break
     return best
 
 
+#Similarly can implement an exhange improvement algorithm - this isnt so greedy - searches for the best exchange. 
+def exchange_improve(route,Dmat):
+    """Exchange improvement algorithm"""
+    best = route[:]
+    size = len(best)
+    improved = True
+    while improved:
+        improved = False
+        for i in range(1, size - 1):
+            for j in range(i+1,size-1):
+                if i ==j:
+                    continue
+                
+
+                A,B,C = best[i-1], best[i], best[i+1]
+                D,E,F = best[j-1], best[j], best[j+1]
+                distance_before = Dmat[A][B] + Dmat[B][C] + Dmat[D][E] + Dmat[E][F]
+                distance_after = Dmat[A][E] + Dmat[E][C] + Dmat[D][B] + Dmat[B][F]
+                #Yep, then we check if there is improvement
+                if distance_after < distance_before:
+                    # Exchange B (i-th node) with D (j-th node)
+                    best[i], best[j] = best[j], best[i]
+                    improved = True
+        route = best
+    return best                    
 
 #We shall only use two opt and three-opt - due to trade-off between time and quality.
 #We'll stop once lambdda-opt optimality i reached.
-#Currently this could violate our cap constraint
+#Currently this could violate our cap constraint - no it couldn't becasue the route is already feasible 
+# - it could be a problem if we introduced pickpups also. 
 
 #Also note that here we're using the best poss reconneciton - we could use first for speed (shall do in 3-opt)
+#Also - we shouldn't be able to move the first and last node as these must remain as the start and end of the route.
 def two_opt(route, Dmat):
     """2-opt method"""
     best = route[:]
@@ -51,6 +85,7 @@ def two_opt(route, Dmat):
     while improved:
         improved = False
         for i in range(1, len(best) - 2):
+            # Symmetry means we can just look at nodes after i
             for j in range(i + 1, len(best) - 1):
                 if j - i == 1:
                     continue  # skips adjacent nodes
@@ -72,7 +107,8 @@ def two_opt(route, Dmat):
     return best
 
 # We now implement 3-opt - with first reconneciton.
-#I suppose 2 opt is a subset of three opt  - but here this isnt implemented a s we take ijk to be separate (double check what we did)
+#2 opt is a subset of three opt  - ie. when the reconnection permutation has a fixed point. 
+#Cant include the end bits. 
 def three_opt(route, Dmat):
     """3-opt with first reconneciton"""
     best = route[:]
@@ -128,3 +164,5 @@ def three_opt(route, Dmat):
             if improved:
                 break
     return best
+
+
