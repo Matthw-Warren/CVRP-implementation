@@ -9,4 +9,3 @@ import components.components as cp
 
 
 #Next we need a large matrix of distances between the locations
-#Chack
