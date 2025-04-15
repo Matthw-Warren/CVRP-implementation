@@ -1,7 +1,4 @@
-Sample Module Repository
-========================
+## CVRP Implementation
+---
 
-This simple project is an example repo for Python projects.
-
-
-Cf https://docs.python-guide.org/writing/structure/ for more info and help!
+Exploration of heuristic algorithms used to solve CVRP.
