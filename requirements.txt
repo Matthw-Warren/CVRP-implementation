@@ -1,2 +1,6 @@
-nose
-sphinx
+numpy
+pandas
+folium
+sys
+os
+matplotlib.pyplot

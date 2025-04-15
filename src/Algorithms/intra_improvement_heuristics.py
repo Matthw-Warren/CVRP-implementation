@@ -106,10 +106,9 @@ def two_opt(route, Dmat):
         route = best
     return best
 
-# We now implement 3-opt - with first reconneciton.
+# We now implement 3-opt - with first reconneciton - hence we don't necessarily get a 3-optimal solution!
 #2 opt is a subset of three opt  - ie. when the reconnection permutation has a fixed point. 
-#Cant include the end bits. 
-def three_opt(route, Dmat):
+def three_opt(route, Dmat, greedy = True):
     """3-opt with first reconneciton"""
     best = route[:]
     size = len(best)
@@ -156,13 +155,17 @@ def three_opt(route, Dmat):
                         if new_dist < d0:
                             best = new_route
                             improved = True
-                            break  # Greedy: accept first improvement
-                    if improved:
+                            if greedy:
+                                break  # Greedy mode accepts the first 
+                    if improved and greedy:
                         break
-                if improved:
+                if improved and greedy:
                     break
-            if improved:
+            if improved and greedy:
                 break
     return best
 
 
+
+
+#Idea : add options for impelementation of each - first or best reconnections/ 

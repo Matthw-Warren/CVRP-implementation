@@ -57,7 +57,7 @@ for i in range(len(Order_List)):
 
 routes, route_loads = ch.PNN_solve(Dmat, random_volumes, Q, F)
 for i in routes.keys():
-    routes[i] = ih.exchange_improve(routes[i], Dmat)
+    routes[i] = ih.three_opt(routes[i], Dmat, False)
 print(routes)
 
 
@@ -126,7 +126,7 @@ for i, route in enumerate(routes.values()):
         opacity=0.7,
     ).add_to(m)
 
+m.save('tests/Maps/PNN_map.html')
 
 
-
-# Eventually in overlay want to toggle routes on and off!
+# # Eventually in overlay want to toggle routes on and off!

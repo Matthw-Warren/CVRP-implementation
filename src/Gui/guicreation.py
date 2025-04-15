@@ -32,4 +32,4 @@ for idx, route in enumerate(routes):
     points = [coords[i] for i in route]
     folium.PolyLine(points, color=colors[idx % len(colors)], weight=5).add_to(m)
 
-st_folium(m)
+st_folium(m,height=500, width=700)
